@@ -1,0 +1,21 @@
+---
+title: "Data Exploration"
+output: html_notebook
+---
+
+```{r}
+library("dplyr")
+library("magrittr")
+```
+
+```{r}
+# Read csv and treat empty strings as NA
+df <- read.csv("data/dataset_sheet1.csv", na.strings = c("", "NA"))
+
+summary(df)
+```
+
+```{r}
+
+```
+
