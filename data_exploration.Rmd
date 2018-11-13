@@ -15,7 +15,80 @@ df <- read.csv("data/dataset_sheet1.csv", na.strings = c("", "NA"))
 summary(df)
 ```
 
+Since this dataset represets 1002 individuals lets look at a subset of our dataframe for only individual 1
 ```{r}
-
+df %>%
+  select(Indnum, Group) %>%
+  group_by(Indnum) %>%
+  distinct() %>%
+  count() %>%
+  View()
 ```
 
+```{r}
+df %>%
+  select(-Group) %>%
+  filter(Activity == "Household heating => 70F") %>%
+  View(title = "Heating >= 70F")
+```
+
+```{r}
+transport <- df %>%
+  select(-Group) %>%
+  filter(Activity == "trips using public ground transportation")
+
+summary(transport[!apply(is.na(transport[,6:15]),1,any),])
+```
+
+```{r}
+df %>%
+  select(Group, Indnum) %>%
+  group_by(Group) %>%
+  arrange(Group) %>%
+  distinct() %>%
+  View(title = "indv per group")
+```
+
+
+```{r}
+df %>%
+  select(Activity, Indnum, Consumption) %>%
+  filter(!is.na(Consumption)) %>%
+  group_by(Activity) %>%
+  #arrange(Group) %>%
+  #distinct() %>%
+  count() %>%
+  View(title = "indv per activity")
+```
+
+
+```{r}
+df %>%
+  select(-Indnum, -Group, -Quality_of_Life_Importance__1_10) %>%
+  arrange(Activity) %>%
+  filter(!is.na(Consumption)) %>%
+  group_by(Activity, Units) %>%
+  summarise_all(funs(sum), na.rm = T) %>%
+  View(title = "activity and their source source")
+```
+
+```{r}
+df %>%
+  select(-Group, -Quality_of_Life_Importance__1_10) %>%
+  arrange(Activity) %>%
+  filter(!is.na(Consumption)) %>%
+  group_by(Indnum, Activity, Units) %>%
+  summarise_all(funs(sum), na.rm = T) %>%
+  View(title = "activity and their source per indv")
+```
+
+
+```{r}
+df %>%
+  select(-Indnum, -Quality_of_Life_Importance__1_10) %>%
+  arrange(Activity) %>%
+  filter(!is.na(Consumption)) %>%
+  group_by(Group, Activity, Units) %>%
+  summarise_all(funs(sum), na.rm = T) %>%
+  View(title = "activity and their source per group")
+```
