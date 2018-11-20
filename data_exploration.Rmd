@@ -6,6 +6,7 @@ output: html_notebook
 ```{r}
 library("dplyr")
 library("magrittr")
+library("readxl")
 ```
 
 ```{r}
@@ -13,6 +14,16 @@ library("magrittr")
 df <- read.csv("data/dataset_sheet1.csv", na.strings = c("", "NA"))
 
 summary(df)
+```
+
+```{r}
+cf_df <- read_excel("data/dataset.xlsx", sheet = "Carbon Footprint", skip = 1)
+cf_df
+save(cf_df, file = "data/data_exploration.rda")
+```
+```{r}
+
+
 ```
 
 Since this dataset represets 1002 individuals lets look at a subset of our dataframe for only individual 1
@@ -92,3 +103,25 @@ df %>%
   summarise_all(funs(sum), na.rm = T) %>%
   View(title = "activity and their source per group")
 ```
+## Constraint QL >= tql_indv
+
+```{r}
+tql_indv <- df %>% 
+  group_by(Indnum) %>%
+  summarise(total_ql = sum(Quality_of_Life_Importance__1_10, na.rm = T))
+
+tql_indv
+```
+
+```{r}
+r
+```
+
+
+
+
+
+
+
+
+
