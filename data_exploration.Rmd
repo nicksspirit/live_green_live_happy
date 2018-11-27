@@ -3,125 +3,93 @@ title: "Data Exploration"
 output: html_notebook
 ---
 
-```{r}
+```{r warning = F}
 library("dplyr")
 library("magrittr")
 library("readxl")
 ```
 
-```{r}
-# Read csv and treat empty strings as NA
-df <- read.csv("data/dataset_sheet1.csv", na.strings = c("", "NA"))
 
-summary(df)
+```{r}
+sheet1 <- read_excel(
+  "data/dataset.xlsx",
+  sheet = "Individuals",
+  range = "A1:P27055"
+)
+
+sheet2 <- read_excel(
+  "data/dataset.xlsx",
+  sheet = "Carbon Footprint",
+  range = "A2:N29"
+)
+```
+
+# Fill all `NA` values with 0
+
+```{r}
+sheet1[is.na(sheet1)] = 0 
+
+sheet1 %>% head()
 ```
 
 ```{r}
-cf_df <- read_excel("data/dataset.xlsx", sheet = "Carbon Footprint", skip = 1)
-cf_df
-save(cf_df, file = "data/data_exploration.rda")
-```
-```{r}
+sheet2[is.na(sheet2)] = 0 
 
-
+sheet2 %>% head()
 ```
 
-Since this dataset represets 1002 individuals lets look at a subset of our dataframe for only individual 1
-```{r}
-df %>%
-  select(Indnum, Group) %>%
-  group_by(Indnum) %>%
-  distinct() %>%
-  count() %>%
-  View()
-```
+# Fill in the carbon footprint for each activity
 
 ```{r}
-df %>%
-  select(-Group) %>%
-  filter(Activity == "Household heating => 70F") %>%
-  View(title = "Heating >= 70F")
-```
+sources <- c(
+  "solar_powered_water_heater",
+  "gas_water_heater",
+  "electric_water_heater_peak_hour",
+  "electric_water_heater_off_peak",
+  "gas",
+  "natural_gas",
+  "hybrid",
+  "electric_peak_hours",
+  "electric_off_peak_hours",
+  "jetfuel"
+)
 
-```{r}
-transport <- df %>%
-  select(-Group) %>%
-  filter(Activity == "trips using public ground transportation")
-
-summary(transport[!apply(is.na(transport[,6:15]),1,any),])
-```
-
-```{r}
-df %>%
-  select(Group, Indnum) %>%
-  group_by(Group) %>%
-  arrange(Group) %>%
-  distinct() %>%
-  View(title = "indv per group")
-```
-
-
-```{r}
-df %>%
-  select(Activity, Indnum, Consumption) %>%
-  filter(!is.na(Consumption)) %>%
-  group_by(Activity) %>%
-  #arrange(Group) %>%
-  #distinct() %>%
-  count() %>%
-  View(title = "indv per activity")
-```
-
-
-```{r}
-df %>%
-  select(-Indnum, -Group, -Quality_of_Life_Importance__1_10) %>%
-  arrange(Activity) %>%
-  filter(!is.na(Consumption)) %>%
-  group_by(Activity, Units) %>%
-  summarise_all(funs(sum), na.rm = T) %>%
-  View(title = "activity and their source source")
+activities <- c(
+  "Household heating => 70F","Household heating < 70F",
+  "Use of heat pump","Use of air conditioner",
+  "shower - short","shower - long (> 3 min)",
+  "bath","wash-up",
+  "use of dishwasher","use of clothes washer",
+  "use of clothes dryer", "use of cooking range",
+  "use of  oven","use of self-clean feature of electric oven",
+  "Small kitchen appliance in the home", "TV/computer use",
+  "air travel - large plane", "air travel - small  plane (<50 seats)",
+  "car trips- self only", "car trips - driver and self",
+  "car trips - 2+ people with multiple end points", "trips using public ground transportation",
+  "bags of garbage disposed", "bags of recycling deposited (negative CF)",
+  "bags of compost deposited (negative CF)","hazardous or electric items disposed",
+  "large items disposed"
+)
 ```
 
 ```{r}
-df %>%
-  select(-Group, -Quality_of_Life_Importance__1_10) %>%
-  arrange(Activity) %>%
-  filter(!is.na(Consumption)) %>%
-  group_by(Indnum, Activity, Units) %>%
-  summarise_all(funs(sum), na.rm = T) %>%
-  View(title = "activity and their source per indv")
+for (activity in activities) {
+  print(activity)
+  cf_activity <- as.vector(unlist(sheet2[sheet2$Activity == activity, sources]))
+  print(cf_activity)
+  activity_sources <- sheet1[sheet1$Activity == activity, sources]
+  result <- data.frame(mapply(`*`, activity_sources, cf_activity, SIMPLIFY = F)) 
+  
+  sheet1[sheet1$Activity == activity, sources] <- result
+}
 ```
 
 
 ```{r}
-df %>%
-  select(-Indnum, -Quality_of_Life_Importance__1_10) %>%
-  arrange(Activity) %>%
-  filter(!is.na(Consumption)) %>%
-  group_by(Group, Activity, Units) %>%
-  summarise_all(funs(sum), na.rm = T) %>%
-  View(title = "activity and their source per group")
-```
-## Constraint QL >= tql_indv
-
-```{r}
-tql_indv <- df %>% 
-  group_by(Indnum) %>%
-  summarise(total_ql = sum(Quality_of_Life_Importance__1_10, na.rm = T))
-
-tql_indv
+sheet1
 ```
 
 ```{r}
-r
+
 ```
-
-
-
-
-
-
-
-
 
