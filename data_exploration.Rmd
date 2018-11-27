@@ -74,9 +74,7 @@ activities <- c(
 
 ```{r}
 for (activity in activities) {
-  print(activity)
   cf_activity <- as.vector(unlist(sheet2[sheet2$Activity == activity, sources]))
-  print(cf_activity)
   activity_sources <- sheet1[sheet1$Activity == activity, sources]
   result <- data.frame(mapply(`*`, activity_sources, cf_activity, SIMPLIFY = F)) 
   
