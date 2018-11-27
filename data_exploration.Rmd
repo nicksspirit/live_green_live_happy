@@ -35,7 +35,7 @@ sheet1 %>% head()
 ```{r}
 sheet2[is.na(sheet2)] = 0 
 
-sheet2 %>% head()
+sheet2
 ```
 
 # Fill in the carbon footprint for each activity
@@ -88,6 +88,44 @@ sheet1
 ```
 
 ```{r}
-
+sheet1 <- sheet1 %>%
+  mutate(total_cf = Consumption * rowSums(.[,sources]))
+  
 ```
+
+
+
+
+```{r}
+sheet1 %>%
+group_by(Indnum) %>% 
+  summarise(total_QLI = sum(Quality_of_Life_Importance__1_10))
+```
+
+
+```{r}
+sheet1 %>%
+group_by(Indnum) %>% 
+  summarise(total_CI = sum(total_cf))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
