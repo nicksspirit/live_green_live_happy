@@ -1,4 +1,15 @@
 .DS_Store
+
+# Virtual Env
+.venv
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter
+.ipynb_checkpoints
+
 # r notebook html
 *.nb.html
 
