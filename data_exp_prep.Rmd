@@ -1,0 +1,117 @@
+---
+title: "Data Exploration & Preparation"
+output: html_notebook
+---
+
+```{r warning = F}
+library("dplyr")
+library("magrittr")
+library("readxl")
+```
+
+```{r echo = F}
+# A list of all the sources and activities
+sources <- c(
+  "solar_powered_water_heater",
+  "gas_water_heater",
+  "electric_water_heater_peak_hour",
+  "electric_water_heater_off_peak",
+  "gas",
+  "natural_gas",
+  "hybrid",
+  "electric_peak_hours",
+  "electric_off_peak_hours",
+  "jetfuel"
+)
+
+activities <- c(
+  "Household heating => 70F","Household heating < 70F",
+  "Use of heat pump","Use of air conditioner",
+  "shower - short","shower - long (> 3 min)",
+  "bath","wash-up",
+  "use of dishwasher","use of clothes washer",
+  "use of clothes dryer", "use of cooking range",
+  "use of  oven","use of self-clean feature of electric oven",
+  "Small kitchen appliance in the home", "TV/computer use",
+  "air travel - large plane", "air travel - small  plane (<50 seats)",
+  "car trips- self only", "car trips - driver and self",
+  "car trips - 2+ people with multiple end points", "trips using public ground transportation",
+  "bags of garbage disposed", "bags of recycling deposited (negative CF)",
+  "bags of compost deposited (negative CF)","hazardous or electric items disposed",
+  "large items disposed"
+)
+```
+
+```{r}
+sheet1 <- read_excel(
+  "data/dataset.xlsx",
+  sheet = "Individuals",
+  range = "A1:P27055"
+)
+
+sheet2 <- read_excel(
+  "data/dataset.xlsx",
+  sheet = "Carbon Footprint",
+  range = "A2:N29"
+)
+```
+
+Below we have a summary of sheet 1 from the excel dataset (excluding sources)
+
+```{r}
+sheet1 %>%
+  select(-sources) %>%
+  summary(sheet1)
+```
+
+
+```{r}
+sheet1 %>%
+  select(-sources) %>%
+  filter(Indnum == 1)
+```
+
+# Data Cleaning
+
+# Fill all `NA` values with 0
+
+```{r}
+sheet1[is.na(sheet1)] = 0 
+
+sheet1 %>% head()
+```
+
+```{r}
+sheet2[is.na(sheet2)] = 0 
+
+sheet2
+```
+
+Fill in the carbon footprint for each activity
+
+```{r}
+for (activity in activities) {
+  cf_activity <- as.vector(unlist(sheet2[sheet2$Activity == activity, sources]))
+  activity_sources <- sheet1[sheet1$Activity == activity, sources]
+  result <- data.frame(mapply(`*`, activity_sources, cf_activity, SIMPLIFY = F)) 
+  
+  sheet1[sheet1$Activity == activity, sources] <- result
+}
+```
+
+# Data Preparation
+
+```{r}
+sheet1 <- sheet1 %>%
+  mutate(TCF = rowSums(.[,sources]))
+```
+
+
+```{r}
+head(sheet1)
+```
+
+
+```{r}
+write.csv(sheet1, "./data/dataset.csv")
+```
