@@ -76,13 +76,13 @@ sheet1 %>%
 # Fill all `NA` values with 0
 
 ```{r}
-sheet1[is.na(sheet1)] = 0 
+sheet1[is.na(sheet1)] <- 0 
 
 sheet1 %>% head()
 ```
 
 ```{r}
-sheet2[is.na(sheet2)] = 0 
+sheet2[is.na(sheet2)] <- 0 
 
 sheet2
 ```
