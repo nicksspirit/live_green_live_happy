@@ -103,7 +103,11 @@ for (activity in activities) {
 
 ```{r}
 sheet1 <- sheet1 %>%
-  mutate(TCF = rowSums(.[,sources]))
+  mutate(
+    TCF = rowSums(.[,sources]),
+    TrQL = Consumption * Quality_of_Life_Importance__1_10
+  )
+  
 ```
 
 
