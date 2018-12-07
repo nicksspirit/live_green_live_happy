@@ -73,7 +73,7 @@ sheet1 %>%
 
 # Data Cleaning
 
-# Fill all `NA` values with 0
+Fill all `NA` values with 0
 
 ```{r}
 sheet1[is.na(sheet1)] <- 0 
@@ -86,6 +86,12 @@ sheet2[is.na(sheet2)] <- 0
 
 sheet2
 ```
+
+
+```{r}
+write.csv(sheet2, "./data/dataset_source_cf.csv")
+```
+
 
 Fill in the carbon footprint for each activity
 
