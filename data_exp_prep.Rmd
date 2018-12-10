@@ -1,12 +1,13 @@
 ---
 title: "Data Exploration & Preparation"
-output: html_notebook
 author:
-    - Prof. Murali Shanker (@mshanker1) - Advisor
-    - Nick (@odintech3)
-    - Spandana (@spandanasudalagunta)
-    - Tina (@davinia1991)
-    
+- Prof. Murali Shanker (@mshanker1) - Advisor
+- Nick (@odintech3)
+- Spandana (@spandanasudalagunta)
+- Tina (@davinia1991)
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r warning = F}
