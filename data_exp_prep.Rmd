@@ -1,12 +1,19 @@
 ---
 title: "Data Exploration & Preparation"
 output: html_notebook
+author:
+    - Prof. Murali Shanker (@mshanker1) - Advisor
+    - Nick (@odintech3)
+    - Spandana (@spandanasudalagunta)
+    - Tina (@davinia1991)
+    
 ---
 
 ```{r warning = F}
 library("dplyr")
 library("magrittr")
 library("readxl")
+library("ggplot2")
 ```
 
 ```{r echo = F}
@@ -42,6 +49,16 @@ activities <- c(
 )
 ```
 
+#Wells Fargo's Campus Analytics Challenge: Live Green and Live Happy
+
+One of Wells Fargo’s priorities is to promote environmental sustainability, which includes accelerating the transition to a low-carbon economy. Taking individual actions can encourage collective responsibility to help achieve this. Using machine learning, create a data product to help individuals optimize the balance between their carbon footprint and quality of life. The data gives a peek into the lives of 1,000 individuals who rated several everyday activities (taking a long shower, driving a car, etc.) on a scale of 1-100 based on how important those activities are to their daily lives.
+
+#Objective
+The goal of this project is to create a machine learning algorithm that minimizes carbon footprint for each customer while maintaining their total quality of life.
+
+
+
+Loading the data into R where sheet1 has the information regrading the individuals and their consumption and sheet2 has information about the carbon footprint for each activity.
 ```{r}
 sheet1 <- read_excel(
   "data/dataset.xlsx",
@@ -56,44 +73,84 @@ sheet2 <- read_excel(
 )
 ```
 
-Below we have a summary of sheet 1 from the excel dataset (excluding sources)
+Below we have a summary of sheet 1 from the excel dataset (excluding sources) to get the summary of the data we are dealing with.
 
 ```{r}
 sheet1 %>%
   select(-sources) %>%
   summary(sheet1)
 ```
-
+ We are trying to look at the data for individual 1  
 
 ```{r}
 sheet1 %>%
   select(-sources) %>%
-  filter(Indnum == 1)
+  filter(Indnum == 1) %>% 
+  head()
+```
+
+Below is a graph showing the sum of consumptions for each activity in their respective units.
+
+
+```{r}
+sheet1 %>%
+  select(Activity, Consumption) %>%
+  group_by(Activity) %>%
+  summarise(sum_consumption = sum(Consumption)) %>%
+  arrange(desc(sum_consumption)) %>%
+  ggplot(aes(x = Activity, y = sum_consumption, fill = sum_consumption)) +
+  geom_bar(stat = 'identity') +
+  coord_flip() +
+  theme_minimal() +
+  guides(fill = F)
+  
+```
+
+Below table shows the maximum and minimum units of consumption for each activity.
+
+```{r}
+sheet1 %>% 
+  select(Activity, Consumption) %>%
+  group_by(Activity) %>%
+  summarise(max_consumption = max(Consumption), min_consumption = min(Consumption))
+  
 ```
 
 # Data Cleaning
 
-Fill all `NA` values with 0
+After reviewing the data we have noticed a lot of missing values. we are assuming that the `NA` values are present in the data because the individual didnot have any consumption for the activity and did not give any rating for the quality of life. we are replacing  all `NA` values in sheet 1 with 0.
 
 ```{r}
 sheet1[is.na(sheet1)] <- 0 
 
-sheet1 %>% head()
+sheet1 %>% 
+  head()
 ```
-
+Replacing all the all `NA` values in sheet2 with 0
 ```{r}
 sheet2[is.na(sheet2)] <- 0 
 
-sheet2
+sheet2 %>%
+  head()
 ```
+Converting the negative values in consumption to positive values.
+```{r}
+sheet1 <- sheet1 %>%
+  mutate_at(.vars = vars(Consumption), .funs = funs(abs))
 
+summary(sheet1)
+```
 
 ```{r}
 write.csv(sheet2, "./data/dataset_source_cf.csv")
 ```
 
+```{r}
+write.csv(sheet1, "./data/dataset_without_source_cf.csv")
+```
 
-Fill in the carbon footprint for each activity
+
+Below we are filling the carbon footprint for each activity, where ever the source has 1 the corresponding carbonfootprint value is filled.
 
 ```{r}
 for (activity in activities) {
@@ -106,18 +163,14 @@ for (activity in activities) {
 ```
 
 # Data Preparation
+In the data preparation stage we have created two new variables TCF = Total carbon footprint for each individual per activity and TrQL = product of consumption and quality of life for each individual per activity. 
 
 ```{r}
 sheet1 <- sheet1 %>%
   mutate(
     TCF = rowSums(.[,sources]),
-    TrQL = Consumption * Quality_of_Life_Importance__1_10
-  )
-  
-```
+    TrQL = Consumption * Quality_of_Life_Importance__1_10)
 
-
-```{r}
 head(sheet1)
 ```
 

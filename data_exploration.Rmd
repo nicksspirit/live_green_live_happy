@@ -24,6 +24,16 @@ sheet2 <- read_excel(
 )
 ```
 
+```{r}
+hist(sheet1$Quality_of_Life_Importance__1_10)
+```
+
+```{r}
+cor(sheet1$Consumption, sheet1$Quality_of_Life_Importance__1_10)
+
+```
+
+
 # Fill all `NA` values with 0
 
 ```{r}
@@ -111,21 +121,62 @@ group_by(Indnum) %>%
 
 
 
+```{r}
+plot(sheet1$Quality_of_Life_Importance__1_10, sheet1$Consumption)
+#lines(sheet1$Quality_of_Life_Importance__1_10, sheet1$Consumption)
+```
+
+```{r}
+boxplot(sheet1$Consumption)
+```
 
 
 
+```{r}
+boxplot(sheet1$Quality_of_Life_Importance__1_10)
+```
 
 
+```{r}
+sheet1 %>%
+group_by(Activity) %>% 
+  summarise(total_C = sum(Consumption)) -> C
+C
+
+```
 
 
+```{r}
+sheet1 %>%
+group_by(Activity) %>% 
+  summarise(total_Cfa = sum(total_cf)) -> Cfa
+Cfa
+```
+
+```{r}
+#plot(C$total_C,Cfa$total_Cfa)
+```
 
 
+```{r}
+summary(sheet1$Consumption)
+```
+
+```{r}
+filter(sheet1, sheet1$Consumption < 0)
+```
+
+```{r}
+summary(sheet1)
+```
+  
+```{r}
+hist(sheet1$Consumption)
+```
 
 
-
-
-
-
-
+```{r}
+hist(sheet1$Quality_of_Life_Importance__1_10)
+```
 
 
