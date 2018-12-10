@@ -89,32 +89,6 @@ sheet1 %>%
   head()
 ```
 
-Below is a graph showing the sum of consumptions for each activity in their respective units.
-
-
-```{r}
-sheet1 %>%
-  select(Activity, Consumption) %>%
-  group_by(Activity) %>%
-  summarise(sum_consumption = sum(Consumption)) %>%
-  arrange(desc(sum_consumption)) %>%
-  ggplot(aes(x = Activity, y = sum_consumption, fill = sum_consumption)) +
-  geom_bar(stat = 'identity') +
-  coord_flip() +
-  theme_minimal() +
-  guides(fill = F)
-  
-```
-
-Below table shows the maximum and minimum units of consumption for each activity.
-
-```{r}
-sheet1 %>% 
-  select(Activity, Consumption) %>%
-  group_by(Activity) %>%
-  summarise(max_consumption = max(Consumption), min_consumption = min(Consumption))
-  
-```
 
 # Data Cleaning
 
@@ -141,12 +115,14 @@ sheet1 <- sheet1 %>%
 summary(sheet1)
 ```
 
-```{r}
+```{r echo = F}
 write.csv(sheet2, "./data/dataset_source_cf.csv")
 ```
 
-```{r}
-write.csv(sheet1, "./data/dataset_without_source_cf.csv")
+```{r echo = F}
+sheet1 %>%
+  select(Indnum, Activity, sources) %>%
+  write.csv("./data/dataset_without_source_cf.csv")
 ```
 
 
@@ -162,7 +138,33 @@ for (activity in activities) {
 }
 ```
 
+Below is a graph showing the sum of consumptions for each activity in their respective units.
+
+```{r}
+sheet1 %>%
+  select(Activity, Consumption) %>%
+  group_by(Activity) %>%
+  summarise(sum_consumption = sum(Consumption)) %>%
+  arrange(desc(sum_consumption)) %>%
+  ggplot(aes(x = Activity, y = sum_consumption, fill = sum_consumption)) +
+  geom_bar(stat = 'identity') +
+  coord_flip() +
+  theme_minimal() +
+  guides(fill = F)
+  
+```
+
+Below table shows the maximum and minimum units of consumption for each activity.
+
+```{r}
+sheet1 %>% 
+  select(Activity, Consumption) %>%
+  group_by(Activity) %>%
+  summarise(max_consumption = max(Consumption), min_consumption = min(Consumption))
+```
+
 # Data Preparation
+
 In the data preparation stage we have created two new variables TCF = Total carbon footprint for each individual per activity and TrQL = product of consumption and quality of life for each individual per activity. 
 
 ```{r}
@@ -175,6 +177,6 @@ head(sheet1)
 ```
 
 
-```{r}
+```{r echo = F}
 write.csv(sheet1, "./data/dataset.csv")
 ```
